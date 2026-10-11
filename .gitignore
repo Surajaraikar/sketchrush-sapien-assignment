@@ -1,0 +1,10 @@
+node_modules
+.next
+.env*
+*.tsbuildinfo
+artifacts/test-results/
+artifacts/playwright-report/
+artifacts/demo/raw/
+artifacts/demo/player-*.webm
+artifacts/demo/frame-*.png
+artifacts/music-page-*.png

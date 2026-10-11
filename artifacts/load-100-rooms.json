@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-11T07:53:07.986Z",
+  "environment": {
+    "node": "v24.17.0",
+    "platform": "win32",
+    "arch": "x64",
+    "cpus": 14,
+    "rooms": 100,
+    "players": 300,
+    "seconds": 15.8,
+    "serverMode": "production",
+    "transport": "websocket"
+  },
+  "events": {
+    "acknowledged": 45225,
+    "received": 45225,
+    "errors": 0,
+    "strokesPerSecond": 2869,
+    "deliveryRatio": 1
+  },
+  "broadcastLatencyMs": {
+    "p50": 3.1609000000007654,
+    "p95": 5.791300000000774,
+    "p99": 6.883700000000317
+  },
+  "server": {
+    "rssStartMb": 102,
+    "rssEndMb": 152,
+    "cpuSecondsUsed": 2.83,
+    "cpuPercentOneCore": 18
+  }
+}
