@@ -11,6 +11,29 @@ async function threePlayers(browser: Browser, mobile=false) {
 async function selectCurrentWord(pages:Page[]) { const drawer=await Promise.any(pages.map(async(p,i)=>{await expect(p.getByText('Pick your secret word')).toBeVisible({timeout:3000});return i;})); const choices=pages[drawer].locator('.word-choices button'); await expect(choices).toHaveCount(3); const word=(await choices.first().innerText()).trim(); await choices.first().click(); await expect(pages[drawer].locator('.word-strip strong')).toHaveText(word); return {drawer,word}; }
 async function draw(p:Page) { await p.locator('canvas').scrollIntoViewIfNeeded();const box=await p.locator('canvas').boundingBox(); if(!box)throw Error('Canvas missing'); await p.mouse.move(box.x+box.width*.2,box.y+box.height*.25);await p.mouse.down();await p.mouse.move(box.x+box.width*.35,box.y+box.height*.4,{steps:12});await p.mouse.up(); }
 async function drawTouch(p:Page) { await p.locator('canvas').scrollIntoViewIfNeeded();const box=await p.locator('canvas').boundingBox();if(!box)throw Error('Canvas missing');const cdp=await p.context().newCDPSession(p);const x=box.x+box.width*.2,y=box.y+box.height*.25;await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=12;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+box.width*.15*i/12,y:y+box.height*.15*i/12}]});}await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();}
+test('desktop drawing layout fits the screen beside both panels',async({browser})=>{
+  const {contexts,pages}=await threePlayers(browser);try{
+    await pages[0].getByRole('button',{name:/Start game/}).click();
+    const {drawer}=await selectCurrentWord(pages);
+    for(const viewport of [{width:1440,height:900},{width:2048,height:1072}]){
+      for(const page of pages)await page.setViewportSize(viewport);
+      for(const page of [pages[drawer],pages[(drawer+1)%3]]){
+        const layout=await page.evaluate(()=>{
+          const rect=(selector:string)=>{const {top,bottom,width,height}=document.querySelector(selector)!.getBoundingClientRect();return {top,bottom,width,height};};
+          return {screen:innerHeight,scrollHeight:document.documentElement.scrollHeight,players:rect('.players-panel'),chat:rect('.chat-panel'),canvas:rect('.canvas-frame'),center:rect('.center-panel'),toolbar:document.querySelector('.toolbar')?rect('.toolbar'):null};
+        });
+        expect(layout.scrollHeight).toBeLessThanOrEqual(layout.screen+1);
+        expect(layout.players.bottom).toBeLessThanOrEqual(layout.screen+1);
+        expect(layout.chat.bottom).toBeLessThanOrEqual(layout.screen+1);
+        expect(Math.abs(layout.players.bottom-layout.chat.bottom)).toBeLessThan(2);
+        expect(layout.canvas.bottom).toBeLessThanOrEqual(layout.screen+1);
+        expect(Math.abs(layout.canvas.width/layout.canvas.height-4/3)).toBeLessThan(.01);
+        if(layout.toolbar)expect(layout.toolbar.bottom).toBeLessThanOrEqual(layout.screen+1);
+        if(page===pages[drawer])await page.screenshot({path:`artifacts/desktop-fit-${viewport.width}.png`});
+      }
+    }
+  }finally{await Promise.all(contexts.map(c=>c.close()));}
+});
 test('three players: permissions, drawing, scoring, final leaderboard and replay',async({browser})=>{
   const {contexts,pages,code}=await threePlayers(browser); try {
     await expect(pages[1].getByRole('button',{name:/Start game/})).toHaveCount(0);
