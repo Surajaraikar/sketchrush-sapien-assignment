@@ -19,7 +19,7 @@ test('desktop drawing layout fits the screen beside both panels',async({browser}
       for(const page of pages)await page.setViewportSize(viewport);
       for(const page of [pages[drawer],pages[(drawer+1)%3]]){
         const layout=await page.evaluate(()=>{
-          const rect=(selector:string)=>{const {top,bottom,width,height}=document.querySelector(selector)!.getBoundingClientRect();return {top,bottom,width,height};};
+          const rect=(selector:string)=>{const {top,bottom,left,right,width,height}=document.querySelector(selector)!.getBoundingClientRect();return {top,bottom,left,right,width,height};};
           return {screen:innerHeight,scrollHeight:document.documentElement.scrollHeight,players:rect('.players-panel'),chat:rect('.chat-panel'),canvas:rect('.canvas-frame'),center:rect('.center-panel'),toolbar:document.querySelector('.toolbar')?rect('.toolbar'):null};
         });
         expect(layout.scrollHeight).toBeLessThanOrEqual(layout.screen+1);
@@ -27,7 +27,9 @@ test('desktop drawing layout fits the screen beside both panels',async({browser}
         expect(layout.chat.bottom).toBeLessThanOrEqual(layout.screen+1);
         expect(Math.abs(layout.players.bottom-layout.chat.bottom)).toBeLessThan(2);
         expect(layout.canvas.bottom).toBeLessThanOrEqual(layout.screen+1);
-        expect(Math.abs(layout.canvas.width/layout.canvas.height-4/3)).toBeLessThan(.01);
+        expect(Math.abs(layout.canvas.width-layout.center.width)).toBeLessThan(2);
+        expect(layout.center.left-layout.players.right).toBeLessThan(30);
+        expect(layout.chat.left-layout.center.right).toBeLessThan(30);
         if(layout.toolbar)expect(layout.toolbar.bottom).toBeLessThanOrEqual(layout.screen+1);
         if(page===pages[drawer])await page.screenshot({path:`artifacts/desktop-fit-${viewport.width}.png`});
       }
