@@ -45,3 +45,20 @@ The load runs preceded the later host-migration and client acknowledgment-race f
 - The large client controller needs separation before long-term maintenance. The browser suite covers major paths but does not simulate network packet reordering or multi-node operation.
 - Load results are local, short duration, and limited to three-player rooms. No defensible production room limit or deployment SLO is claimed.
 - `artifacts/demo/sketchrush-three-player-demo.mp4` is an exactly two-minute silent recording composed from three independent browser contexts. Sampled frames were visually checked; narration and human presentation polish can be added if desired.
+
+## Final engineering review
+
+| Area | Implemented and verified | Remaining risk / next improvement |
+|---|---|---|
+| Architecture | Server owns game authority; client has separate canvas renderer. Tested full three-player flow. | `Game.tsx` combines session control and UI. Split by feature before sustained development. |
+| Type safety | Strict `tsc` checks app and browser tests. | Validate incoming Socket.IO payloads at runtime and share schemas with server. |
+| Real-time correctness | Sequenced operations, versioned snapshots, late join, refresh, and drawer disconnect passed browser tests. | Test packet reordering, extended network loss, and concurrent multi-node behavior. |
+| Security | Word choices are drawer-only; scores and permissions are server-owned; key limits exist. Browser tests check public word masking and private near miss. | Add stronger abuse controls and fuzz payload validation; do not deploy the in-memory demo publicly without operational controls. |
+| Error handling | Forms show server errors; reconnect has visible state. | Add network-fault and server-restart browser tests. |
+| Performance | Local load at 100 rooms/300 players delivered 45,225 strokes with no errors in 15.8 s. | Measure browser frame times, WAN latency, and long-duration heap growth. |
+| Accessibility | Labels, focus rings, live notices, and mobile touch work in browser tests. | Audit WCAG 2.2 AA with assistive technology; freehand drawing has no keyboard equivalent. |
+| Testing | Five real browser scenarios, socket smoke, strict types, lint, production build. | Add unit coverage for reducer edge cases and permission/rate boundaries. |
+| UI/UX | Desktop and mobile screenshots inspected; no horizontal overflow at 390 px. | Test additional phone sizes and browser engines. |
+| Operations | Clean `npm ci` plus one-command startup was exercised; README documents restart behavior. | Add persistent room state, multi-instance support, deployment configuration, and monitoring before production. |
+
+The game is suitable as a tested assignment demo. It is not production ready. GitHub publication and the submission email are separate final actions.
