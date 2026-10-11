@@ -46,5 +46,5 @@ Statuses: **Verified** = observed in executed tests or inspected export; **Imple
 
 | Requirement | Status | Gap |
 |---|---|---|
-| GitHub repository link | Incomplete | Local Git repository exists; no GitHub remote has been created or uploaded. |
+| GitHub repository link | Verified | Public repository: https://github.com/Surajaraikar/sketchrush-sapien-assignment |
 | Email to Sapien Robotics | Incomplete | No submission email was sent. |

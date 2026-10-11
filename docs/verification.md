@@ -61,4 +61,4 @@ The load runs preceded the later host-migration and client acknowledgment-race f
 | UI/UX | Desktop and mobile screenshots inspected; no horizontal overflow at 390 px. | Test additional phone sizes and browser engines. |
 | Operations | Clean `npm ci` plus one-command startup was exercised; README documents restart behavior. | Add persistent room state, multi-instance support, deployment configuration, and monitoring before production. |
 
-The game is suitable as a tested assignment demo. It is not production ready. GitHub publication and the submission email are separate final actions.
+The game is suitable as a tested assignment demo. It is not production ready. The public GitHub repository was published and verified; the submission email remains a separate final action.
